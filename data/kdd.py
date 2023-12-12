@@ -15,7 +15,7 @@ def get_test(*args):
     return _get_adapted_dataset("test")
 
 def get_shape_input():
-    """Get shape of the dataset for KDD 10 percent"""
+    """Get shape of the dataset for KDD 10 percent,表示行不定，列式121"""
     return (None, 121)
 
 def get_shape_label():
@@ -88,6 +88,7 @@ def _get_adapted_dataset(split):
     key_img = 'x_' + split
     key_lbl = 'y_' + split
 
+    # 如果用作测试，那么数据集处理一下，异常数据和正常数据都有。训练集只有异常数据
     if split != 'train':
         dataset[key_img], dataset[key_lbl] = _adapt(dataset[key_img],
                                                     dataset[key_lbl])
@@ -128,28 +129,28 @@ def _col_names():
     "dst_host_rerror_rate","dst_host_srv_rerror_rate","label"]
 
 def _adapt(x, y, rho=0.2):
-    """Adapt the ratio of normal/anomalous data"""
+    """Adapt the ratio of normal/anomalous data， 即按一定比例返回正常、异常的数据。rho可以看做是异常值点占正常值点的比例，即rho=异常：正常"""
 
     # Normal data: label =0, anomalous data: label =1
 
-    rng = np.random.RandomState(42) # seed shuffling
+    rng = np.random.RandomState(42)  # seed shuffling，随机数生成器
 
     inliersx = x[y == 0]
     inliersy = y[y == 0]
-    outliersx = x[y == 1]
+    outliersx = x[y == 1]  # 离群值
     outliersy = y[y == 1]
 
     size_outliers = outliersx.shape[0]
-    inds = rng.permutation(size_outliers)
-    outliersx, outliersy = outliersx[inds], outliersy[inds]
+    inds = rng.permutation(size_outliers)  # 生成打乱顺序的数值列
+    outliersx, outliersy = outliersx[inds], outliersy[inds]  # 得到打乱顺序的异常值
 
     size_test = inliersx.shape[0]
     out_size_test = int(size_test*rho/(1-rho))
 
-    outestx = outliersx[:out_size_test]
+    outestx = outliersx[:out_size_test]  # 按比例抽取异常值点
     outesty = outliersy[:out_size_test]
 
-    testx = np.concatenate((inliersx,outestx), axis=0)
+    testx = np.concatenate((inliersx,outestx), axis=0)  # 拼接全部正常值和抽取的异常值点
     testy = np.concatenate((inliersy,outesty), axis=0)
 
     size_test = testx.shape[0]
