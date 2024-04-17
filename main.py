@@ -55,10 +55,9 @@ def path(d):
         raise argparse.ArgumentTypeError("Example {} cannot be located.".format(d))
 
 if __name__ == "__main__":
-    # example: 模型，bigan或者gan  dataset:数据集，kdd或minist   split: 固定为run  nb_epochs: 迭代轮次数 label: 异常标签 w: 映射损失权重 m: 鉴别器损失函数类型 d:特征匹配损失   rd:随机数种子
     parser = argparse.ArgumentParser(description='Run examples from the DL 2.0 Anomaly Detector.')
-    parser.add_argument('example', nargs="?", type=path, help='the folder name of the example you want to run e.g gan or bigan')
-    parser.add_argument('dataset', nargs="?", choices=['mnist', 'kdd'], help='the name of the dataset you want to run the experiments on')
+    parser.add_argument('example', nargs="?", type=path, help='the folder name of the example you want to run e.g gan or micnn')
+    parser.add_argument('dataset', nargs="?", choices=['micnn'], help='the name of the dataset you want to run the experiments on')
     parser.add_argument('split', nargs="?", choices=['run'], help='train the example or evaluate it')
     parser.add_argument('--nb_epochs', nargs="?", type=int, help='number of epochs you want to train the dataset on')
     parser.add_argument('--label', nargs="?", type=int, help='anomalous label for the experiment')
@@ -66,5 +65,4 @@ if __name__ == "__main__":
     parser.add_argument('--m', nargs="?", default='fm', choices=['cross-e', 'fm'], help='mode/method for discriminator loss')
     parser.add_argument('--d', nargs="?", default=1, type=int, help='degree for the L norm')
     parser.add_argument('--rd', nargs="?", default=42, type=int, help='random_seed')
-
     run(parser.parse_args())
